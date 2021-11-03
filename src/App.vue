@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div class="office">
-      <Map />
-      <SideMenu />
+      <Map v-bind:dataLegend="legend" />
+      <SideMenu v-bind:dataLegend="legend" />
     </div>
   </div>
 </template>
@@ -10,12 +10,18 @@
 <script>
 import Map from "./components/Map.vue";
 import SideMenu from "./components/SideMenu.vue";
+import legend from "./assets/data/legend.json";
 
 export default {
   name: "App",
   components: {
     Map,
     SideMenu,
+  },
+  data() {
+    return {
+      legend: legend,
+    };
   },
 };
 </script>

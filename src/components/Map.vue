@@ -15,18 +15,23 @@ import MapSVG from "../assets/images/map.svg";
 import * as d3 from "d3";
 import tables from "../assets/data/tables.json";
 import Table from "../assets/images/workPlace.svg";
-import legend from "../assets/data/legend.json";
 
 export default {
   components: {
     MapSVG,
     Table,
   },
+  props: {
+    dataLegend: {
+      type: Array,
+      default: null,
+    },
+  },
   data() {
     return {
       isLoading: false,
       svg: null,
-      g: null,
+      rootElemSVG: null,
       tableSVG: null,
       tables: [],
     };
@@ -38,10 +43,10 @@ export default {
     this.isLoading = true;
 
     this.svg = d3.select(this.$refs.svg);
-    this.g = this.svg.select("g");
+    this.rootElemSVG = this.svg.select("g");
     this.tableSVG = d3.select(this.$refs.table);
 
-    if (this.g) {
+    if (this.rootElemSVG) {
       this.drawTables();
     } else {
       alert("SVG is incorrect");
@@ -51,7 +56,7 @@ export default {
   },
   methods: {
     drawTables() {
-      const svgTablesGroupPlace = this.g
+      const svgTablesGroupPlace = this.rootElemSVG
         .append("g")
         .classed("groupPlaces", true);
 
@@ -70,8 +75,8 @@ export default {
           .html(this.tableSVG.html())
           .attr(
             "fill",
-            legend.find((it) => it.group_id === table.group_id)?.color ??
-              "transparent"
+            this.dataLegend.find((it) => it.group_id === table.group_id)
+              ?.color ?? "transparent"
           );
       });
     },
