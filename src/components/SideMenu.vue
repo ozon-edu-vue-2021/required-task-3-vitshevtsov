@@ -18,24 +18,28 @@
       <div v-if="!isUserOpenned" class="legend">
         <div class="legend__data">
           <div v-if="legend.length > 0" class="legend__items">
-            <LegendItem
-              v-for="(item, index) in legend"
-              :key="index"
-              :color="item.color"
-              :text="item.text"
-              :counter="item.counter"
-              class="legend__item"
-            />
+            <Draggable v-model="legend">
+              <LegendItem
+                v-for="(item, index) in legend"
+                :key="index"
+                :color="item.color"
+                :text="item.text"
+                :counter="item.counter"
+                class="legend__item"
+              />
+            </Draggable>
           </div>
           <span v-else class="legend--empty"> Список пуст </span>
         </div>
         <div class="legend__chart">
-          <!-- chart -->
+          <div>
+            {{ formatedDate }}
+          </div>
+          <PieChart ref="chart" />
         </div>
       </div>
       <div v-else class="profile">
         <div v-if="!person" class="profile__empty">Место пустое</div>
-
         <PersonCard :person="person" />
       </div>
     </div>
@@ -46,6 +50,9 @@
 import LegendItem from "./SideMenu/LegendItem.vue";
 import PersonCard from "./SideMenu/PersonCard.vue";
 import legend from "@/assets/data/legend.json";
+import Draggable from "vuedraggable";
+import { Doughnut as PieChart } from "vue-chartjs";
+import { format } from "date-fns";
 
 export default {
   props: {
@@ -61,6 +68,8 @@ export default {
   components: {
     LegendItem,
     PersonCard,
+    Draggable,
+    PieChart,
   },
   data() {
     return {
@@ -70,12 +79,39 @@ export default {
   created() {
     this.loadLegend();
   },
+  mounted() {
+    this.makeChart();
+  },
+  computed: {
+    formatedDate() {
+      return format(new Date(), "dd.MM.yyyy hh:mm");
+    },
+  },
   methods: {
     loadLegend() {
       this.legend = legend;
     },
     closeProfile() {
       this.$emit("update:isUserOpenned", false);
+    },
+    makeChart() {
+      const legendChartData = {
+        labels: this.legend.map((it) => it.text),
+        datasets: [
+          {
+            label: "Легенда",
+            backgroundColor: this.legend.map((legendItem) => legendItem.color),
+            data: this.legend.map((legendItem) => legendItem.counter),
+          },
+        ],
+      };
+      const options = {
+        borderWidth: "10px",
+        legend: {
+          display: false,
+        },
+      };
+      this.$refs.chart.renderChart(legendChartData, options);
     },
   },
 };
