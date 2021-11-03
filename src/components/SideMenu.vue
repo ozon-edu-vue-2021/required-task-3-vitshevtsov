@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     formatedDate() {
-      return format(new Date(), "dd.MM.yyyy hh:mm");
+      return format(new Date(), "dd.MM.yyyy HH:mm");
     },
   },
   methods: {
